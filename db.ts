@@ -1,5 +1,6 @@
 import pg from "pg";
 import dotenv from "dotenv";
+import { Idol } from "./types/Idol";
 
 dotenv.config();
 
@@ -10,3 +11,5 @@ const pool = new pg.Pool({
   database: process.env.DB_NAME,
   port: 5432,
 });
+
+const insertIdol = (idol: Idol) => {};
