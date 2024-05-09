@@ -1,4 +1,5 @@
 export type Group = {
-  id: number;
+  id?: number;
   name: string;
+  url: string;
 };

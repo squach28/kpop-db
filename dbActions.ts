@@ -1,5 +1,7 @@
 import { pool } from "./db";
 import { bucket } from "./firebase";
+import { Idol } from "./types/Idol";
+import { Group } from "./types/Group";
 
 // inserts image into pg db
 export const insertIdol = async (idol: Idol) => {
@@ -49,6 +51,22 @@ export const insertImage = async (
     });
 
     return upload[1];
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
+
+export const insertGroup = async (group: Group) => {
+  try {
+    const name = group.name;
+    const query =
+      "INSERT INTO groups (name) VALUES ($1) ON CONFLICT DO NOTHING RETURNING ID";
+    const result = await pool.query(query, [name]);
+    if (result.rows.length > 0) {
+      return result.rows[0].id;
+    }
+    return null;
   } catch (e) {
     console.log(e);
     return null;

@@ -1,5 +1,7 @@
 import axios from "axios";
 import fs from "fs";
+import { getDownloadURL } from "firebase-admin/storage";
+import { bucket } from "./firebase";
 
 // downloads an image from a name (idol), groupName, and url to download the image from
 export const downloadImage = async (
@@ -24,6 +26,17 @@ export const downloadImage = async (
         .on("finish", () => resolve({ groupName, idolName, fileType }))
         .on("error", (e) => reject(e));
     });
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
+
+export const getDownloadUrl = async (fileName: string) => {
+  try {
+    const file = bucket.file(fileName);
+    const downloadURL = await getDownloadURL(file);
+    return downloadURL;
   } catch (e) {
     console.log(e);
     return null;
