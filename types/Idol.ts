@@ -1,8 +1,9 @@
 export type Idol = {
   id: number;
   name: string;
-  birth_name: string;
-  image_url: string;
+  birthName: string;
+  nationality: string;
+  imageUrl: string;
   dob: string;
-  group_id: number;
+  groupId: number;
 };
