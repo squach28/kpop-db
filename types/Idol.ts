@@ -1,5 +1,5 @@
 export type Idol = {
-  id: number;
+  id?: number;
   name: string;
   birthName: string;
   nationality: string;

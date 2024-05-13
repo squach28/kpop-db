@@ -57,12 +57,34 @@ export const insertImage = async (
   }
 };
 
+export const getGroupById = async (id: number) => {
+  try {
+    const query = "SELECT * FROM groups WHERE id = $1";
+    const result = pool.query(query, [id], (err, res) => {
+      if (err) {
+        console.log(err);
+        return null;
+      }
+
+      if (res.rows.length === 0) {
+        return null;
+      }
+      const group = res.rows[0];
+      return group;
+    });
+
+    return result;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
+
 export const insertGroup = async (group: Group) => {
   try {
-    const name = group.name;
     const query =
-      "INSERT INTO groups (name) VALUES ($1) ON CONFLICT DO NOTHING RETURNING ID";
-    const result = await pool.query(query, [name]);
+      "INSERT INTO groups (name, url) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING ID";
+    const result = await pool.query(query, [group.name, group.url]);
     if (result.rows.length > 0) {
       return result.rows[0].id;
     }

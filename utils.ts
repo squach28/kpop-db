@@ -57,3 +57,30 @@ export const deleteGroupDirectory = (groupName) => {
     fs.rmSync(`./${groupName}`, { recursive: true, force: true });
   }
 };
+
+// parses a date into date format for postgres
+// removes any letters from the day
+export const parseDate = (date: string) => {
+  const splitBirthday = date.split(/\s/);
+
+  if (splitBirthday.length < 3) {
+    return null;
+  }
+
+  const day = splitBirthday[1];
+  let numberedDay = "";
+  const zeroCharCode = "0".charCodeAt(0);
+  const nineCharCode = "9".charCodeAt(0);
+
+  for (let i = 0; i < day.length; i++) {
+    if (
+      zeroCharCode <= day.charCodeAt(i) &&
+      nineCharCode >= day.charCodeAt(i)
+    ) {
+      numberedDay += day[i];
+    }
+  }
+
+  splitBirthday[1] = numberedDay;
+  return splitBirthday.join(" ");
+};
