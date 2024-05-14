@@ -65,7 +65,7 @@ export const getTopKpopArtists = async () => {
       });
     });
 
-    console.log(results);
+    return results;
   } catch (e) {
     console.log(e);
   }
