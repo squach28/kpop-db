@@ -30,7 +30,7 @@ export const getTopKpopArtists = async () => {
   try {
     const ITEMS_PER_PAGE = 20;
     const accessToken = await getAccessToken();
-    const url = `${SPOTIFY_API_URL}/search?q=genre%3Dkpop&type=artist&limit=20`;
+    const url = `${SPOTIFY_API_URL}/search?q=genre%3Dk-pop&type=artist&limit=20`;
     const res = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -59,8 +59,8 @@ export const getTopKpopArtists = async () => {
     promiseResults.forEach((result) => {
       const items = result.data.artists.items;
       items.forEach((item) => {
-        if (!results.includes(item)) {
-          results.push(item);
+        if (!results.includes(item.name)) {
+          results.push(item.name);
         }
       });
     });
@@ -71,4 +71,28 @@ export const getTopKpopArtists = async () => {
   }
 };
 
-getTopKpopArtists();
+export const getArtistInfo = async (artistName: string) => {
+  try {
+    const accessToken = await getAccessToken();
+    const url = `${SPOTIFY_API_URL}/search?q=artist:${artistName}&type=artist&limit=1`;
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (res.data.artists.items.length < 1) {
+      return null;
+    }
+
+    const artist = res.data.artists.items[0];
+    const isKpopArtist = artist.genres.find((genre) => genre.includes("k-pop"));
+    if (!isKpopArtist) {
+      return null;
+    }
+
+    return artist;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
