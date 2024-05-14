@@ -40,8 +40,9 @@ export const insertImage = async (
   groupName: string,
   idolName: string,
   fileType: string,
-) => {
+): Promise<Object> => {
   try {
+    console.log("inserting image");
     const idolNameWithUnderScores = idolName.replace(/\s/, "_");
     const fileName = `./${groupName}/${idolName}.${fileType}`;
     const destination = `/${groupName}/${idolNameWithUnderScores}.${fileType}`;
@@ -49,7 +50,7 @@ export const insertImage = async (
       destination,
       gzip: true,
     });
-
+    console.log(upload[1]);
     return upload[1];
   } catch (e) {
     console.log(e);

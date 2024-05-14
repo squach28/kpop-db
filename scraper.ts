@@ -2,9 +2,10 @@ import playwright, { chromium } from "playwright";
 import cheerio, { load } from "cheerio";
 import { Group } from "./types/Group";
 import { Idol } from "./types/Idol";
-import { downloadImage, parseDate } from "./utils";
+import { downloadImage, getDownloadUrl, parseDate } from "./utils";
+import { insertImage } from "./dbActions";
 
-export const getKpopGroups = async (url: string) => {
+export const getKpopGroups = async (url: string): Promise<Group[]> => {
   const browser = await chromium.launch({
     headless: true,
   });
@@ -47,8 +48,9 @@ export const getKpopGroups = async (url: string) => {
   await browser.close();
   return groups;
 };
-// scrap information about a kpop grooup using a url
-export const getGroupInfo = async (group: Group): Promise<Idol[]> => {
+// scrap information about a kpop grooup using a group
+// group contains id, name, and url
+export const getIdolsInfo = async (group: Group): Promise<Idol[]> => {
   try {
     const browser = await chromium.launch({
       headless: true,
@@ -97,6 +99,8 @@ export const getGroupInfo = async (group: Group): Promise<Idol[]> => {
           if (parsedKey === "birthday" || parsedKey === "birth_date") {
             const dob = parseDate(parsedValue);
             data["dob"] = dob;
+          } else if (parsedKey === "stage_name") {
+            data["name"] = parsedValue.split("(")[0].trim();
           } else if (parsedKey === "birth_name") {
             data[parsedKey] = parsedValue.split("(")[0].trim();
           } else {
@@ -107,20 +111,20 @@ export const getGroupInfo = async (group: Group): Promise<Idol[]> => {
           data["image_url"] = element("img").attr("src");
         }
       }
-
-      const idol: Idol = {
-        name: data["name"],
-        birthName: data["birth_name"],
-        nationality: data["nationality"],
-        imageUrl: data["image_url"],
-        dob: data["dob"],
-        groupId: group.id,
-      };
-
-      idols.push(idol);
-
-      return idols;
+      const imageUrl = data["image_url"];
+      const name = data["name"];
+      // download image from image_url
+      downloadImage(name, group.name, imageUrl).then(async (res) => {
+        if (res !== null) {
+          const { groupName, idolName, fileType } = res;
+          const upload = await insertImage(groupName, idolName, fileType);
+          const name = upload["name"];
+          const downloadURL = await getDownloadUrl(name);
+        }
+      });
     }
+
+    return idols;
   } catch (e) {
     console.log(e);
     return [];

@@ -8,7 +8,11 @@ export const downloadImage = async (
   name: string,
   groupName: string,
   url: string,
-) => {
+): Promise<{
+  groupName: string;
+  idolName: string;
+  fileType: string;
+} | null> => {
   try {
     const idolName = name.toLowerCase();
     const res = await axios({
@@ -20,11 +24,12 @@ export const downloadImage = async (
       const contentType = res.headers["content-type"];
       const splittedType = contentType.split("/");
       const fileType = splittedType[splittedType.length - 1];
+      createGroupDirectory(groupName);
 
       res.data
         .pipe(fs.createWriteStream(`./${groupName}/${idolName}.${fileType}`))
         .on("finish", () => resolve({ groupName, idolName, fileType }))
-        .on("error", (e) => reject(e));
+        .on("error", (e) => reject(null));
     });
   } catch (e) {
     console.log(e);
@@ -45,7 +50,7 @@ export const getDownloadUrl = async (fileName: string) => {
 
 // creates a directory for a kpop group
 export const createGroupDirectory = (groupName: string) => {
-  if (!fs.existsSync(groupName)) {
+  if (fs.existsSync(groupName)) {
     return;
   }
   fs.mkdirSync(groupName);
