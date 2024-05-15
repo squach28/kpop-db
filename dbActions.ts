@@ -7,7 +7,7 @@ import { Group } from "./types/Group";
 export const insertIdol = async (idol: Idol) => {
   try {
     const INSERT_QUERY =
-      "INSERT INTO idols (name, birth_name, dob, image_url, nationality, group_id) values ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING RETURNINiG ID";
+      "INSERT INTO idols (name, birth_name, dob, image_url, nationality, group_id) values ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING RETURNING ID";
     return pool.query(
       INSERT_QUERY,
       [
@@ -22,7 +22,9 @@ export const insertIdol = async (idol: Idol) => {
         if (err) {
           console.log(err);
           console.log(`err for ${idol.name}`);
+          return false;
         }
+        console.log(result);
         if (result.rows.length > 0) {
           return result.rows[0].id;
         }
@@ -84,8 +86,12 @@ export const getGroupById = async (id: number) => {
 export const insertGroup = async (group: Group) => {
   try {
     const query =
-      "INSERT INTO groups (name, url) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING ID";
-    const result = await pool.query(query, [group.name, group.url]);
+      "INSERT INTO groups (name, url, image_url) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING ID";
+    const result = await pool.query(query, [
+      group.name,
+      group.url,
+      group.imageUrl,
+    ]);
     if (result.rows.length > 0) {
       return result.rows[0].id;
     }

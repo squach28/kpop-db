@@ -1,7 +1,9 @@
 import { insertGroup } from "./dbActions";
 import { getIdolsInfo, getKpopGroups } from "./scraper";
 import { getArtistInfo, getTopKpopArtists } from "./spotify";
-import fs from "fs";
+import { Group } from "./types/Group";
+import { deleteGroupDirectory } from "./utils";
+
 const url = "https://kprofiles.com/k-pop-girl-groups/";
 
 // getTopKpopArtists().then((artists) => {
@@ -9,11 +11,20 @@ const url = "https://kprofiles.com/k-pop-girl-groups/";
 // const names = artists.map((artist) => artist.name.toLowerCase());
 getKpopGroups(url).then(async (groups) => {
   for (let group of groups) {
-    await getArtistInfo(group.name);
+    const artistInfo = await getArtistInfo(group.name);
     setTimeout(() => {}, 2000);
-    // if (names.includes(group.name.toLowerCase())) {
-    // console.log(group.name);
-    // }
+    if (artistInfo !== null) {
+      const groupInfo: Group = {
+        name: artistInfo.name,
+        url: group.url,
+        imageUrl:
+          artistInfo.images.length > 0 ? artistInfo.images[0].url : null,
+      };
+      const groupId = await insertGroup(groupInfo);
+      groupInfo.id = groupId;
+      await getIdolsInfo(groupInfo);
+      deleteGroupDirectory(group.name);
+    }
   }
 });
 // });

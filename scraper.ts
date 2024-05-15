@@ -3,7 +3,7 @@ import cheerio, { load } from "cheerio";
 import { Group } from "./types/Group";
 import { Idol } from "./types/Idol";
 import { downloadImage, getDownloadUrl, parseDate } from "./utils";
-import { insertImage } from "./dbActions";
+import { insertIdol, insertImage } from "./dbActions";
 
 export const getKpopGroups = async (url: string): Promise<Group[]> => {
   const browser = await chromium.launch({
@@ -120,6 +120,15 @@ export const getIdolsInfo = async (group: Group): Promise<Idol[]> => {
           const upload = await insertImage(groupName, idolName, fileType);
           const name = upload["name"];
           const downloadURL = await getDownloadUrl(name);
+          const idol = {
+            name: data["name"],
+            birthName: data["birth_name"],
+            nationality: data["nationality"],
+            imageUrl: downloadURL,
+            dob: data["dob"],
+            groupId: group.id,
+          };
+          await insertIdol(idol);
         }
       });
     }
