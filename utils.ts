@@ -29,7 +29,7 @@ export const downloadImage = async (
       res.data
         .pipe(fs.createWriteStream(`./${groupName}/${idolName}.${fileType}`))
         .on("finish", () => resolve({ groupName, idolName, fileType }))
-        .on("error", (e) => reject(null));
+        .on("error", () => reject(null));
     });
   } catch (e) {
     console.log(e);
@@ -57,7 +57,7 @@ export const createGroupDirectory = (groupName: string) => {
 };
 
 // removes all files from a directory and deletes the directory
-export const deleteGroupDirectory = (groupName) => {
+export const deleteGroupDirectory = (groupName: string) => {
   if (fs.existsSync(groupName)) {
     fs.rmSync(`./${groupName}`, { recursive: true, force: true });
   }

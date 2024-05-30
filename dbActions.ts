@@ -60,6 +60,7 @@ export const insertImage = async (
   }
 };
 
+// gets a kpop group by id
 export const getGroupById = async (id: number) => {
   try {
     const query = "SELECT * FROM groups WHERE id = $1";
@@ -83,6 +84,7 @@ export const getGroupById = async (id: number) => {
   }
 };
 
+// inserts a kpop group into the db
 export const insertGroup = async (group: Group) => {
   try {
     const query =

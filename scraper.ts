@@ -5,6 +5,7 @@ import { Idol } from "./types/Idol";
 import { downloadImage, getDownloadUrl, parseDate } from "./utils";
 import { insertIdol, insertImage } from "./dbActions";
 
+// get a list of kpop groups from a url
 export const getKpopGroups = async (url: string): Promise<Group[]> => {
   const browser = await chromium.launch({
     headless: true,

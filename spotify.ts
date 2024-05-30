@@ -6,6 +6,7 @@ dotenv.config();
 const SPOTIFY_API_URL = "https://api.spotify.com/v1";
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 
+// gets an access token to make calls with spotify api
 const getAccessToken = async () => {
   const auth = Buffer.from(
     process.env.SPOTIFY_CLIENT_ID + ":" + process.env.SPOTIFY_SECRET,
@@ -71,6 +72,7 @@ export const getTopKpopArtists = async () => {
   }
 };
 
+// gets information about an artist using the name
 export const getArtistInfo = async (artistName: string) => {
   try {
     const accessToken = await getAccessToken();
@@ -85,7 +87,9 @@ export const getArtistInfo = async (artistName: string) => {
     }
 
     const artist = res.data.artists.items[0];
-    const isKpopArtist = artist.genres.find((genre) => genre.includes("k-pop"));
+    const isKpopArtist = artist.genres.find((genre: string[]) =>
+      genre.includes("k-pop"),
+    );
     if (!isKpopArtist) {
       return null;
     }
